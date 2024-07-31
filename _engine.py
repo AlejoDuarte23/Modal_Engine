@@ -5,6 +5,7 @@ from scipy.fftpack import fft, fftfreq
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.colors import LinearSegmentedColormap
+from typing import Optional, List , Dict , Union , Tuple    
 
 # import _MODF_LSQ_V3 as LSQ
 matplotlib.use('Qt5Agg')
@@ -224,8 +225,9 @@ class DataVisualizer:
         plt.tight_layout()
         plt.show()
         
-    def plot_psd(self, mode='default',color='blue',legend = ['EW','NS','Z']):
+    def plot_psd(self, mode='default',color='blue',legend:Optional[list] = None):   
         colormap = Colormap()
+
         if mode == 'default':
             plt.figure(figsize=(10, 6))
             for i in range(self.data_instance.psd.shape[1]):
@@ -240,7 +242,7 @@ class DataVisualizer:
             plt.tight_layout()
             plt.show()
 
-        elif mode == 'join':
+        if mode == 'join':
             
             plt.figure(figsize=(10, 6))
             Nplots = self.data_instance.psd.shape[1]
@@ -258,14 +260,16 @@ class DataVisualizer:
 
             plt.show()
 
-    def plot_spectrogram(self, nfft=256, noverlap=128, cmap='viridis', legend=['EW', 'NS', 'Z']):
+    def plot_spectrogram(self, nfft=256, noverlap=128, cmap='viridis', legend:Optional[list] = None):
         plt.figure(figsize=(10, 6))
         for i in range(self.data_instance.data.shape[1]):
             plt.subplot(self.data_instance.data.shape[1], 1, i + 1)
             Pxx, freqs, bins, im = plt.specgram(self.data_instance.data[:, i], NFFT=nfft, Fs=self.data_instance.fs,
                                                 noverlap=noverlap, cmap=cmap)
-            # plt.legend([legend[i]],loc='upper right')
-            plt.figtext(0.98, 0.9, legend[i], fontsize='medium',
+
+            if not legend:
+                current_legend = f"Series_{i+1}"
+            plt.figtext(0.98, 0.9, current_legend, fontsize='medium',
                         verticalalignment='top',
                         horizontalalignment='right',
                         transform=plt.gca().transAxes,
@@ -276,11 +280,6 @@ class DataVisualizer:
                 plt.xlabel('Time [sec]')
 
         plt.suptitle('Spectrogram of ' + self.data_instance.name)
-        # plt.figlegend([legend[i] for i in range(self.data_instance.data.shape[1])], loc='lower center', ncol=self.data_instance.data.shape[1], labelspacing=0.)
-        # for i, label in enumerate(legend):
-            
-
-        # plt.tight_layout()
         plt.show()
 
 
