@@ -23,6 +23,11 @@ class SingleMeasurement:
         self.data = None
         self.tdata = None
 
+    def set_data(self, data):
+        self.data = data
+        self.tdata = np.arange(0, len(data) / self.fs, 1 / self.fs)
+        return self
+
     def load_asc(self, sk_row=38, cols=[0, 1]):
         try:
             with self.file_path.open('r') as fd:
@@ -79,6 +84,7 @@ class FFTDomain:
     
     def create_initial_values(self , Nm, _S, f):
         return LSQ.create_initial_values(Nm, _S, f)
+    
     @staticmethod
     def nextpow2(Acc):
         N = Acc.shape[0]
@@ -91,8 +97,8 @@ class FFTDomain:
         fs = self.fs
         Nc = Acc.shape[1]  # Calculate Nc from self.data
         AN = self.nextpow2(Acc)
-        PSD = np.zeros((Nc,Nc,int(AN/2)+1),dtype=np.complex_)
-        freq= np.zeros((Nc,Nc,int(AN/2)+1),dtype=np.complex_)
+        PSD = np.zeros((Nc,Nc,int(AN/2)+1),dtype=np.complex128)
+        freq= np.zeros((Nc,Nc,int(AN/2)+1),dtype=np.complex128)
     
         for i in range(Nc):
             for j in range(Nc):
