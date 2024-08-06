@@ -1,0 +1,5 @@
+*.env
+modalenv/
+export
+testing.py
+test/

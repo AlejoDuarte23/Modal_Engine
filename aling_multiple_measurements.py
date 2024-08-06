@@ -6,7 +6,7 @@ class AlignMultipleMeasurements:
     def __init__(self, signals: List[np.ndarray]):
         self.signals = signals
 
-    def align_signals(self):
+    def align_signals_with_pad(self)-> List[np.ndarray]:
         lengths = [len(signal) for signal in self.signals]
         min_length = min(lengths)
         max_length = max(lengths)
@@ -47,6 +47,35 @@ class AlignMultipleMeasurements:
             aligned_signals[i] = np.pad(aligned_signals[i], (0, pad_length), 'constant', constant_values=(0,))
 
         return aligned_signals
+    
+    def aling_singla_with_roll(self)-> List[np.ndarray]:
+        lengths = [len(signal) for signal in self.signals]
+        min_length = min(lengths)
+        max_length = max(lengths)
+        shortest_signal = self.signals[lengths.index(min_length)]
 
+        aligned_signals = []
 
+        for signal in self.signals:
+            if np.array_equal(signal, shortest_signal):
+                aligned_signals.append(signal)
+                continue
+
+            # Compute cross-correlation
+            acor = np.correlate(shortest_signal, signal, mode='full')
+            # -lent(signal) represents the shift where the start of signal aligns with the end of shortest_signal.
+            # len(shortest_signal) this represents the shift where the end of signal aligns with the start of shortest_signal.
+            lag = np.arange(-len(signal) + 1, len(shortest_signal))
+            acormax_idx = np.argmax(np.abs(acor))
+            lagDiff = lag[acormax_idx]
+
+            if lagDiff > 0:
+                aligned_signal = np.roll(signal, -lagDiff)
+            else:
+                aligned_signal = signal[-lagDiff:-1]
+            
+            aligned_signals.append(aligned_signal)
+
+        return aligned_signals
+  
 
